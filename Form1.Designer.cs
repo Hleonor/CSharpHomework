@@ -28,11 +28,17 @@ namespace WinFormsApp1
         /// <summary>
         /// selfmat有四种状态0, 1, 2, -1；
         /// 0是是初始态，仅作为逻辑处理中出现
-        /// 1是初始状态
-        /// 2是被击中机身
-        /// -1是被击中机头，被击中机头就沉
+        /// 1是机头，为红色
+        /// 2是机身，蓝色
+        /// -1是被击中的部分，灰色
         /// </summary>
         private int[,] selfmat = new int[10, 10]; 
+        /// <summary>
+        /// 敌方矩阵有三种状态
+        /// 1表示打中机头，红色
+        /// 2表示击中机身，蓝色
+        /// -1表示没有击中，黑色
+        /// </summary>
         private int[,] enemymat = new int[10, 10];//己方和敌方矩阵
         private int[,] enemysetmat = new int[10, 10];//敌方部署矩阵
 
@@ -195,7 +201,7 @@ namespace WinFormsApp1
                     int i, j;
                     foreach (var r in selfrects)
                     {
-                        if (r.Contains(e.X, e.Y))
+                        if (r.Contains(e.X, e.Y)) // 
                         {
                             i = count / 10;
                             j = count % 10;
@@ -203,7 +209,7 @@ namespace WinFormsApp1
                             {
 
                             }
-                            if (selfmat[i, j] == 0)
+                            if (selfmat[i, j] == 0) // 如果这个矩阵块没有处理过
                             {
                                 selfmat[i, j] = 1;
                                 sethead = count;
