@@ -14,12 +14,12 @@ namespace WinFormsApp1
     {
         public Form1()
         {
-            InitializeComponent();
+            InitializeComponent(); // 初始化组件
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e) // 定义按钮点击事件
         {
-            if(planes==3)
+            if(planes==3) // 飞机数量为3
             {
                 return;
             }
@@ -27,9 +27,9 @@ namespace WinFormsApp1
             ListenMessage();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e) 
         {
-            this.RePlace();
+            this.RePlace(); // 重新布局
         }
     }
 }

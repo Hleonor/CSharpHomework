@@ -13,18 +13,13 @@ namespace WinFormsApp1
 {
     partial class Form1
     {
-        /// <summary>
-        ///  Required designer variable.
-        /// </summary>
-        
-        
         //数据
-        static int state = 0; // 0是停止状态。1是开局部署状态，2是进攻状态
+        static int state = 0; // 该状态是系统状态，0是停止状态。1是开局部署状态，2是进攻状态
         
         static int setstate = 1; // 1是放机头，2是放机身方向
         static int sethead = 0; // 机头位置
         //static int attackpos = 0;//本次攻击位置
-        static int planes = 0;
+        static int planes = 0; // 飞机数量
         /// <summary>
         /// selfmat有四种状态0, 1, 2, -1；
         /// 0是是初始态，仅作为逻辑处理中出现
@@ -32,7 +27,7 @@ namespace WinFormsApp1
         /// 2是机身，蓝色
         /// -1是被击中的部分，灰色
         /// </summary>
-        private int[,] selfmat = new int[10, 10]; 
+        private int[,] selfmat = new int[10, 10]; // 自己的飞机矩阵
         /// <summary>
         /// 敌方矩阵有三种状态
         /// 1表示打中机头，红色
@@ -42,16 +37,11 @@ namespace WinFormsApp1
         private int[,] enemymat = new int[10, 10];//己方和敌方矩阵
         private int[,] enemysetmat = new int[10, 10];//敌方部署矩阵
 
-        private int selfHP = 0;
+        private int selfHP = 0; // 自己的血量
         //0是空白，1是机头，2是机身
 
 
         private System.ComponentModel.IContainer components = null; // 添加一个容器
-
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -62,12 +52,7 @@ namespace WinFormsApp1
         }
 
         #region Windows Form Designer generated code
-
-        /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
+        private void InitializeComponent() 
         {
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
@@ -119,13 +104,10 @@ namespace WinFormsApp1
         }
 
 
-        Rectangle[] selfrects; // 用于存储己方矩阵的矩形
-        Rectangle[] enemyrects; // 用于存储敌方矩阵的矩形
+        Rectangle[] selfrects; // 用于存储己方矩阵的矩形，全局变量，用来进行显示在界面上的，成员变量中的mat是用来维护状态的
+        Rectangle[] enemyrects; // 用于存储敌方矩阵的矩形，全局变量
         protected override void OnLoad(EventArgs e) // 初始化己方和敌矩阵
         {
-            //int d = (Height - 60) / 5;
-            //int x = (Width - d * 5) / 2;
-            //int y = (Height - d * 5) / 4;
             int d = 50, x1 = 40, y1 = 40; // d是矩形的边长，x1和y1是矩形的左上角坐标
             int x2 = 700, y2 = 40; // x2和y2是敌方矩阵的左上角坐标
 
@@ -159,27 +141,27 @@ namespace WinFormsApp1
             {
                 for(int j=0;j<10;j++)
                 {
-                    if (selfmat[i, j] == 1)
+                    if (selfmat[i, j] == 1) // 1表示机头，用红色表示
                     {
                         g.FillRectangle(Brushes.Red, selfrects[i * 10 + j]); 
                     }
-                    if (selfmat[i, j] == 2) 
+                    if (selfmat[i, j] == 2) // 2表示机身，用蓝色表示
                     {
                         g.FillRectangle(Brushes.Blue, selfrects[i * 10 + j]);
                     }
-                    if(selfmat[i,j]==-1)
+                    if(selfmat[i,j]==-1) // -1表示被打中，用灰色表示
                     {
                         g.FillRectangle(Brushes.Gray, selfrects[i * 10 + j]);//被敌方击中
                     }
-                    if(enemymat[i,j]==1)
+                    if(enemymat[i,j]==1) // 敌方矩阵，1表示打中机头，红色表示
                     {
                         g.FillRectangle(Brushes.Red, enemyrects[i * 10 + j]);
                     }
-                    if (enemymat[i, j] == 2)
+                    if (enemymat[i, j] == 2) // 2表示打中机身，蓝色表示
                     {
                         g.FillRectangle(Brushes.Blue, enemyrects[i * 10 + j]);
                     }
-                    if (enemymat[i, j] == -1)
+                    if (enemymat[i, j] == -1) // -1表示没有打中，用黑色表示
                     {
                         g.FillRectangle(Brushes.Black, enemyrects[i * 10 + j]);
                     }
@@ -189,7 +171,7 @@ namespace WinFormsApp1
         
         void OnMouseDown(object sender, MouseEventArgs e) // 处理鼠标操作
         {
-            if(state==0) // 停止状态，等待对方操作，我方不进行操作
+            if(state==0) // 停止状态，等待对方操作，我方不进行操作，直接返回
             {
                 return;
             }
@@ -201,7 +183,7 @@ namespace WinFormsApp1
                     int i, j;
                     foreach (var r in selfrects)
                     {
-                        if (r.Contains(e.X, e.Y)) // 
+                        if (r.Contains(e.X, e.Y)) // e是鼠标点击的位置，如果点击的位置在矩形内
                         {
                             i = count / 10;
                             j = count % 10;
@@ -214,7 +196,7 @@ namespace WinFormsApp1
                                 selfmat[i, j] = 1;
                                 sethead = count;
                                 setstate = 2;//下次放机身
-                                Invalidate();
+                                Invalidate(); // 重绘
                                 return;
                             }
 
@@ -222,7 +204,7 @@ namespace WinFormsApp1
                         count++;
                     }
                 }
-                if (setstate == 2)
+                if (setstate == 2) // 放置机身
                 {
                     int count = 0;
                     //int i, j;
@@ -230,8 +212,8 @@ namespace WinFormsApp1
                     {
                         if (r.Contains(e.X, e.Y))
                         {
-                            int res = SetJudge(count);
-                            if(res==1)
+                            int res = SetJudge(count); // 判断是否可以放置机身
+                            if (res==1)
                             {
                                 setstate = 1;
                                 planes++;
