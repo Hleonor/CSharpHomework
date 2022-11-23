@@ -207,7 +207,6 @@ namespace WinFormsApp1
                 if (setstate == 2) // 放置机身
                 {
                     int count = 0;
-                    //int i, j;
                     foreach (var r in selfrects)
                     {
                         if (r.Contains(e.X, e.Y))
@@ -215,10 +214,10 @@ namespace WinFormsApp1
                             int res = SetJudge(count); // 判断是否可以放置机身
                             if (res==1)
                             {
-                                setstate = 1;
+                                setstate = 1; // 如果能放置机身，则重新回到放置机头的状态
                                 planes++;
-                                SetPlane(sethead, count);
-                                if(planes==3)
+                                SetPlane(sethead, count); // 放置机身，第一个参数是机头的位置，第二个参数是机身的位置
+                                if (planes==3)
                                 {
                                     selfHP = 3;
                                     state = 0;
@@ -236,7 +235,7 @@ namespace WinFormsApp1
                 }
                 
             }
-            if(state==2)
+            if(state==2) // 2是进攻状态
             {
                 int count = 0;
                 int i, j;
@@ -252,11 +251,6 @@ namespace WinFormsApp1
                         }
                         if (enemymat[i, j] == 0)
                         {
-                            //enemymat[i, j] = 1;
-                            //sethead = count;
-                            //setstate = 2;//下次放机身
-                            //Invalidate();
-
                             if(enemysetmat[i,j]==0)
                             {
                                 enemymat[i, j] = -1;
@@ -537,6 +531,8 @@ namespace WinFormsApp1
         private Button button1;
         private Button button2;
         private Button button3;
+
+
     }
 }
 
