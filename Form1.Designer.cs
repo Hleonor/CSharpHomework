@@ -3,9 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 
@@ -57,6 +61,7 @@ namespace WinFormsApp1
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -71,7 +76,7 @@ namespace WinFormsApp1
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(362, 615);
+            this.button2.Location = new System.Drawing.Point(323, 615);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(178, 63);
             this.button2.TabIndex = 1;
@@ -81,17 +86,28 @@ namespace WinFormsApp1
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(603, 615);
+            this.button3.Location = new System.Drawing.Point(523, 615);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(133, 63);
             this.button3.TabIndex = 2;
             this.button3.Text = "button3";
             this.button3.UseVisualStyleBackColor = true;
             // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(684, 615);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(117, 63);
+            this.button4.TabIndex = 3;
+            this.button4.Text = "Connect";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
             // Form1
             // 
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1400, 700);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -532,7 +548,102 @@ namespace WinFormsApp1
         private Button button2;
         private Button button3;
 
+        // 创建1个客户端套接字和1个负责监听服务端请求的线程
+        Thread threadClient = null;
+        Socket socketClient = null;
 
+
+        private void btnConnection_Click(object sender, EventArgs e)
+        {
+            this.button4.Enabled = false; // 将该按钮设置为可以点击可以操作
+            // 定义一个套接字监听
+            socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            // 获取IP地址
+            IPAddress address = IPAddress.Parse("127.0.0.1");
+
+            // 将获取的IP地址和端口号绑定在网络节点上
+            IPEndPoint point = new IPEndPoint(address, 8098);
+
+            try
+            {
+                // 客户端套接字连接到网络节点上，使用connect
+                socketClient.Connect(point);
+            }
+            catch (Exception)
+            {
+                Debug.Write("连接失败\r\n");
+
+                return;
+            }
+
+            threadClient = new Thread(recv);
+            threadClient.IsBackground = true;
+            threadClient.Start();
+        }
+
+        // 接受服务端发来的消息
+        private void recv()
+        {
+            int x = 0;
+            // 持续监听服务端发来的消息
+            while (true)
+            {
+                try
+                {
+                    // 定义一个1M的内存缓冲区，用于临时性存储接收到的消息  
+                    byte[] arrRecvmsg = new byte[1024 * 1024];
+
+                    // 将客户端套接字收到的数据存储内存缓冲区，并获取长度
+                    int length = socketClient.Receive(arrRecvmsg);
+
+                    string strRecMsg = Encoding.UTF8.GetString(arrRecvmsg);
+                    if (x == 1)
+                    {
+                        // this.txtDebugInfo.AppendText("服务器:" + GetCurrentTime() + "\r\n" + strRecMsg + "\r\n\n");
+                        Debug.WriteLine("服务器:" + GetCurrentTime() + "\r\n" + strRecMsg + "\r\n\n");
+                    }
+                    else
+                    {
+                        // this.txtDebugInfo.AppendText(strRevMsg + "\r\n\n");
+                        Debug.WriteLine(strRecMsg + "\r\n\n");
+                        x = 1;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("远程服务器已经中断连接" + "\r\n\n");
+                    Debug.WriteLine("远程服务器已经中断连接" + "\r\n");
+                    break;
+                }
+            }    
+        }
+
+        private DateTime GetCurrentTime()
+        {
+            DateTime currentTime = new DateTime();
+            currentTime = DateTime.Now;
+            return currentTime;
+        }
+
+        // 发送字符信息到服务端的方法  
+        void ClientSendMsg(string sendMsg)
+        {
+            // 将输入的内容字符串转换为机器可以识别的字节数组     
+            byte[] arrClientSendMsg = Encoding.UTF8.GetBytes(sendMsg);
+            // 调用客户端套接字发送字节数组
+
+            // 发送坐标
+            socketClient.Send(arrClientSendMsg);
+
+            
+            // 将发送的信息追加到聊天内容文本框中     
+            Debug.WriteLine("hello...." + ": " + GetCurrentTime() + "\r\n" + sendMsg + "\r\n\n");
+            //this.txtDebugInfo.AppendText("hello...." + ": " + GetCurrentTime() + "\r\n" + sendMsg + "\r\n\n");
+        }
+
+       
+        private Button button4;
     }
 }
 

@@ -31,5 +31,11 @@ namespace WinFormsApp1
         {
             this.RePlace(); // 重新布局
         }
+
+        private void button4_Click(object sender, EventArgs e) // 连接
+        {
+            // 向服务器发送连接请求
+            
+        }
     }
 }
